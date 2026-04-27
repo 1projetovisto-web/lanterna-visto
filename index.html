@@ -10,6 +10,7 @@ body {
   background: black;
   overflow: hidden;
   font-family: monospace;
+  cursor: none; /* 🔥 cursor invisível */
 }
 
 #ascii-container {
@@ -34,18 +35,24 @@ body {
 const chars = "01VISTO_LAB<>[]{}/\\LUGARzinho//4º Distrito//POA|!@#$%&*+=-_~^";
 const container = document.getElementById("ascii-container");
 
+// gerar código
 let ascii = "";
 for (let i = 0; i < 12000; i++) {
   ascii += chars[Math.floor(Math.random() * chars.length)];
 }
 container.textContent = ascii;
 
+// posição
 let targetX = window.innerWidth / 2;
 let targetY = window.innerHeight / 2;
+
 let currentX = targetX;
 let currentY = targetY;
 
 const ease = 0.08;
+
+// 🔥 TRAIL
+let trail = [];
 
 document.addEventListener("mousemove", (e) => {
   targetX = e.clientX;
@@ -53,20 +60,32 @@ document.addEventListener("mousemove", (e) => {
 });
 
 function animate() {
+  // inércia
   currentX += (targetX - currentX) * ease;
   currentY += (targetY - currentY) * ease;
 
-  container.style.maskImage =
-    `radial-gradient(circle 320px at ${currentX}px ${currentY}px,
-    rgba(0,0,0,1) 20%,
-    rgba(0,0,0,0.6) 50%,
-    rgba(0,0,0,0) 100%)`;
+  // adiciona rastro
+  trail.push({ x: currentX, y: currentY, life: 1 });
 
-  container.style.webkitMaskImage =
-    `radial-gradient(circle 320px at ${currentX}px ${currentY}px,
-    rgba(0,0,0,1) 20%,
-    rgba(0,0,0,0.6) 50%,
-    rgba(0,0,0,0) 100%)`;
+  if (trail.length > 25) {
+    trail.shift();
+  }
+
+  // cria múltiplas máscaras
+  let gradients = trail.map(p => {
+    const alpha = p.life;
+    p.life *= 0.93; // fade suave
+
+    return `radial-gradient(circle 240px at ${p.x}px ${p.y}px,
+      rgba(0,0,0,${alpha}) 10%,
+      rgba(0,0,0,0.5) 40%,
+      rgba(0,0,0,0) 100%)`;
+  });
+
+  const mask = gradients.join(",");
+
+  container.style.webkitMaskImage = mask;
+  container.style.maskImage = mask;
 
   requestAnimationFrame(animate);
 }
