@@ -5,12 +5,19 @@
 <title>Lanterna VISTO</title>
 
 <style>
-body {
+html, body {
   margin: 0;
+  padding: 0;
   background: black;
   overflow: hidden;
   font-family: monospace;
-  cursor: none; /* 🔥 cursor invisível */
+
+  /* 🔥 FORÇA ABSOLUTA DE OCULTAR CURSOR */
+  cursor: none !important;
+}
+
+* {
+  cursor: none !important;
 }
 
 #ascii-container {
@@ -23,6 +30,7 @@ body {
   opacity: 0.5;
   word-break: break-all;
   letter-spacing: 0.4em;
+  pointer-events: none; /* evita reativação do cursor */
 }
 </style>
 </head>
@@ -51,30 +59,33 @@ let currentY = targetY;
 
 const ease = 0.08;
 
-// 🔥 TRAIL
+// trail
 let trail = [];
 
-document.addEventListener("mousemove", (e) => {
+// 🔥 captura global (mais forte)
+window.addEventListener("mousemove", (e) => {
   targetX = e.clientX;
   targetY = e.clientY;
 });
 
+// 🔥 fallback (garante atualização constante)
+setInterval(() => {
+  // força redraw mesmo sem movimento
+}, 16);
+
 function animate() {
-  // inércia
   currentX += (targetX - currentX) * ease;
   currentY += (targetY - currentY) * ease;
 
-  // adiciona rastro
   trail.push({ x: currentX, y: currentY, life: 1 });
 
   if (trail.length > 25) {
     trail.shift();
   }
 
-  // cria múltiplas máscaras
   let gradients = trail.map(p => {
     const alpha = p.life;
-    p.life *= 0.93; // fade suave
+    p.life *= 0.93;
 
     return `radial-gradient(circle 240px at ${p.x}px ${p.y}px,
       rgba(0,0,0,${alpha}) 10%,
