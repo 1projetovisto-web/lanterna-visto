@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Lanterna VISTO</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+#ascii-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  color: #00FF41;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.5;
+  word-break: break-all;
+  letter-spacing: 0.4em;
+}
+</style>
+</head>
+
+<body>
+
+<div id="ascii-container"></div>
+
+<script>
+const chars = "01VISTO_LAB<>[]{}/\\LUGARzinho//4º Distrito//POA|!@#$%&*+=-_~^";
+const container = document.getElementById("ascii-container");
+
+let ascii = "";
+for (let i = 0; i < 12000; i++) {
+  ascii += chars[Math.floor(Math.random() * chars.length)];
+}
+container.textContent = ascii;
+
+let targetX = window.innerWidth / 2;
+let targetY = window.innerHeight / 2;
+let currentX = targetX;
+let currentY = targetY;
+
+const ease = 0.08;
+
+document.addEventListener("mousemove", (e) => {
+  targetX = e.clientX;
+  targetY = e.clientY;
+});
+
+function animate() {
+  currentX += (targetX - currentX) * ease;
+  currentY += (targetY - currentY) * ease;
+
+  container.style.maskImage =
+    `radial-gradient(circle 320px at ${currentX}px ${currentY}px,
+    rgba(0,0,0,1) 20%,
+    rgba(0,0,0,0.6) 50%,
+    rgba(0,0,0,0) 100%)`;
+
+  container.style.webkitMaskImage =
+    `radial-gradient(circle 320px at ${currentX}px ${currentY}px,
+    rgba(0,0,0,1) 20%,
+    rgba(0,0,0,0.6) 50%,
+    rgba(0,0,0,0) 100%)`;
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
